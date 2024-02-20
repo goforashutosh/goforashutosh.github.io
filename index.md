@@ -6,11 +6,11 @@ Hi, I am a fourth year PhD student at the <a href = "https://diro.umontreal.ca/e
 
 My work involves studying quantum information theory to prove security of cryptographic protocols.
 
-I am currently looking for opportunities in applied cryptography, particularly to build applications which enhance privacy and security of everyday users.
+I am presently looking for opportunities in applied cryptography, particularly to build applications which enhance privacy and security of everyday users.
 
 ## Education
 
-Currently, I work as a PhD student with <a href="https://www.iro.umontreal.ca/~dupuisf/" target="_blank">Frédéric Dupuis</a> at the University of Montreal. Prior to this, I completed my master's at the Institute for Quantum Computing, University of Waterloo and my bachelor's at the Indian Institute of Technology, Delhi.
+Currently, I work as a PhD student with <a href="https://www.iro.umontreal.ca/~dupuisf/" target="_blank">Frédéric Dupuis</a> at the University of Montreal. Prior to this, I completed my master's at the Institute for Quantum Computing, University of Waterloo working with <a href="https://lutkenhausgroup.wordpress.com/" target="_blank">Norbert Lütkenhaus</a> and my bachelor's at the Indian Institute of Technology, Delhi.
 
 ## Publications
 
