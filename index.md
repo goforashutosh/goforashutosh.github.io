@@ -36,6 +36,7 @@ Master's thesis: [link](http://hdl.handle.net/10012/15087), [pdf](./docs/Master-
 
 1. Approximately equal measurements result in approximately equal statistics: [pdf](https://github.com/goforashutosh/Close-meas-imply-close-stats/blob/master/paper.pdf)
 1. Approximate equality of quantum states implies operator inequality in large subspace: [link](https://mathoverflow.net/questions/448774/does-approximate-equality-of-quantum-states-imply-operator-inequality-in-a-large)
+1. Presentation on [BabySpartan](https://eprint.iacr.org/2023/1799) (work by Srinath Setty and Justin Thaler): [pptx](./presentations/Presn-babySpartan.pptx)
 
 ---
 
