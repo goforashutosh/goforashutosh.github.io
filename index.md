@@ -17,10 +17,11 @@ Master's thesis: [link](http://hdl.handle.net/10012/15087), [pdf](./docs/Master-
 ## Publications
 
 1. Ashutosh Marwah and Frédéric Dupuis. Universal smooth min-entropy chain rules from entropic triangle inequalities. <a href = "./docs/uni-ch-rules.pdf" target="_blank">pre-preprint </a>
+   - Presentation at BIID 2024: [pptx](./presentations/uni-ch-rules-BIID.pptx)
 1. Ashutosh Marwah and Frédéric Dupuis. Proving security of BB84 under source correlations. <a href = "https://arxiv.org/abs/2402.12346" target="_blank">arXiv:2402.12346 </a> (2024)
    - Presentation at QKD workshop in IQC: [pptx](./presentations/Source_correlations.pptx)
 1. Ashutosh Marwah and Frédéric Dupuis. Smooth min-entropy lower bounds for approximation chains (preprint). <a href = "https://arxiv.org/abs/2308.11736" target="_blank">arXiv:2308.11736 </a> (2023)
-   - Presentation for SRS Quantum Information: [pptx](./presentations/Approx-chains.pptx)
+   - Presentation for SRS Quantum Information/ BIID 2023: [pptx](./presentations/Approx-chains.pptx)
 1. Ashutosh Marwah and Frédéric Dupuis. Uniform continuity bound for sandwiched Rényi conditional entropy. <a href= "https://aip.scitation.org/doi/abs/10.1063/5.0088507" target="_blank">Journal of Mathematical Physics, 63(5):052201</a> (2022)
 1. Ashutosh Marwah and Dave Touchette. Optical quantum communication complexity in the simultaneous-message-passing model. <a href = "https://journals.aps.org/pra/abstract/10.1103/PhysRevA.102.062608" target="_blank">Phys. Rev. A 102, 062608</a> (2020)
 1. Norbert Lütkenhaus, Ashutosh Marwah and Dave Touchette. Erasable Bit Commitment From Temporary Quantum Trust. <a href =" https://ieeexplore.ieee.org/abstract/document/9169704" target="_blank">IEEE Journal on Selected Areas in Information Theory, vol. 1, no. 2, pp. 536-554</a> (2020).
