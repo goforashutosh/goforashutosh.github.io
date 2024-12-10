@@ -16,11 +16,11 @@ Master's thesis: [link](http://hdl.handle.net/10012/15087), [pdf](./docs/Master-
 
 ## Publications
 
-1. Ashutosh Marwah and Frédéric Dupuis. Universal smooth min-entropy chain rules from entropic triangle inequalities. <a href = "./docs/uni-ch-rules.pdf" target="_blank">pre-preprint </a>
+1. Ashutosh Marwah and Frédéric Dupuis. Universal chain rules from entropic triangle inequalities (preprint). <a href = "https://arxiv.org/abs/2412.06723" target="_blank">arXiv:2412.06723 </a> (2024)
    - Presentation at BIID 2024: [pptx](./presentations/uni-ch-rules-BIID.pptx)
-1. Ashutosh Marwah and Frédéric Dupuis. Proving security of BB84 under source correlations. <a href = "https://arxiv.org/abs/2402.12346" target="_blank">arXiv:2402.12346 </a> (2024)
+1. Ashutosh Marwah and Frédéric Dupuis. Proving security of BB84 under source correlations (preprint). <a href = "https://arxiv.org/abs/2402.12346" target="_blank">arXiv:2402.12346 </a> (2024)
    - Presentation at QKD workshop in IQC: [pptx](./presentations/Source_correlations.pptx)
-1. Ashutosh Marwah and Frédéric Dupuis. Smooth min-entropy lower bounds for approximation chains (preprint). <a href = "https://arxiv.org/abs/2308.11736" target="_blank">arXiv:2308.11736 </a> (2023)
+1. Ashutosh Marwah and Frédéric Dupuis. Smooth min-entropy lower bounds for approximation chains. <a href = "https://link.springer.com/article/10.1007/s00220-024-05074-8" target="_blank">Commun. Math. Phys. 405, 211 </a> (2024)
    - Presentation for SRS Quantum Information/ BIID 2023: [pptx](./presentations/Approx-chains.pptx)
 1. Ashutosh Marwah and Frédéric Dupuis. Uniform continuity bound for sandwiched Rényi conditional entropy. <a href= "https://aip.scitation.org/doi/abs/10.1063/5.0088507" target="_blank">Journal of Mathematical Physics, 63(5):052201</a> (2022)
 1. Ashutosh Marwah and Dave Touchette. Optical quantum communication complexity in the simultaneous-message-passing model. <a href = "https://journals.aps.org/pra/abstract/10.1103/PhysRevA.102.062608" target="_blank">Phys. Rev. A 102, 062608</a> (2020)
