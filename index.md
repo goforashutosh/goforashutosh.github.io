@@ -8,15 +8,15 @@ Hi, I am a cryptography researcher at <a href="https://www.ingonyama.com/" targe
 
 I completed my PhD in Computer Science in the field of quantum information theory and cryptography under the supervision of <a href="https://www.iro.umontreal.ca/~dupuisf/" target="_blank">Frédéric Dupuis</a> at the University of Montreal. My thesis titled _An exploration of approximation chains_ identified approximation structures which frequently occur in quantum protocols and developed techniques for their analysis.
 
-PhD thesis: [link](https://umontreal.scholaris.ca/items/848920f5-8256-4e46-b6ff-c74a67049734), [pdf](./docs/phd_thesis.pdf)
+PhD thesis: <a href = "https://umontreal.scholaris.ca/items/848920f5-8256-4e46-b6ff-c74a67049734" target="_blank">link</a>, <a href = "./docs/phd_thesis.pdf" target="_blank">pdf</a>
 
 Prior to this, I completed my master's at the Institute for Quantum Computing, University of Waterloo working with <a href="https://lutkenhausgroup.wordpress.com/" target="_blank">Norbert Lütkenhaus</a> and my bachelor's at the Indian Institute of Technology, Delhi.
 
-Master's thesis: [link](http://hdl.handle.net/10012/15087), [pdf](./docs/Master-thesis.pdf)
+Master's thesis: <a href = "http://hdl.handle.net/10012/15087" target="_blank">link</a>, <a href = "./docs/Master-thesis.pdf" target="_blank">pdf</a>
 
 ## Recent
 
-1. <a href = "https://hackmd.io/@Ingonyama/fast-labrador-prover" target="_blank">Let's Labrador</a>: an Ingonyama blog post explaining the Labrador zkSNARK
+1. <a href = "https://hackmd.io/@Ingonyama/fast-labrador-prover" target="_blank">Let's Labrador</a>: an Ingonyama blog post explaining the Labrador zkSNARK.
 1. Preprint for "Security proof for parallel DIQKD" <a href = "https://arxiv.org/abs/2507.03991" target="_blank">arXiv:2507.03991 </a> released.
 
 ## Publications
@@ -42,7 +42,7 @@ Master's thesis: [link](http://hdl.handle.net/10012/15087), [pdf](./docs/Master-
 
 ## Miscellaneous
 
-1. <a href = "https://hackmd.io/@Ingonyama/fast-labrador-prover" target="_blank">Let's Labrador</a>: an Ingonyama blog post explaining the Labrador zkSNARK
+1. <a href = "https://hackmd.io/@Ingonyama/fast-labrador-prover" target="_blank">Let's Labrador</a>: an Ingonyama blog post explaining the Labrador zkSNARK.
 1. Presentation on <a href = "https://eprint.iacr.org/2023/1799" target="_blank">BabySpartan</a> (work by Srinath Setty and Justin Thaler): [pptx](./presentations/Presn-babySpartan.pptx)
 1. Approximately equal measurements result in approximately equal statistics: [pdf](https://github.com/goforashutosh/Close-meas-imply-close-stats/blob/master/paper.pdf)
 1. Approximate equality of quantum states implies operator inequality in large subspace: [link](https://mathoverflow.net/questions/448774/does-approximate-equality-of-quantum-states-imply-operator-inequality-in-a-large)
