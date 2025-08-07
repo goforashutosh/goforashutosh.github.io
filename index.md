@@ -2,20 +2,26 @@
 layout: default
 ---
 
-Hi, I am a fourth year PhD student at the <a href = "https://diro.umontreal.ca/english/home/" target="_blank">Department of Computer Science and Operation Research</a> in the University of Montreal.
-
-My work involves studying quantum information theory to prove security of cryptographic protocols.
-
-I am presently looking for opportunities in applied cryptography, particularly to build applications which enhance privacy and security of everyday users.
+Hi, I am a cryptography researcher at <a href="https://www.ingonyama.com/" target="_blank">Ingonyama</a>. My work looks into the efficient implementation of cryptography, especially zero-knowledge protocols.
 
 ## Education
 
-Currently, I work as a PhD student with <a href="https://www.iro.umontreal.ca/~dupuisf/" target="_blank">Frédéric Dupuis</a> at the University of Montreal. Prior to this, I completed my master's at the Institute for Quantum Computing, University of Waterloo working with <a href="https://lutkenhausgroup.wordpress.com/" target="_blank">Norbert Lütkenhaus</a> and my bachelor's at the Indian Institute of Technology, Delhi.
+I completed my PhD in Computer Science in the field of quantum information theory and cryptography under the supervision of <a href="https://www.iro.umontreal.ca/~dupuisf/" target="_blank">Frédéric Dupuis</a> at the University of Montreal. My thesis titled _An exploration of approximation chains_ identified approximation structures which frequently occur in quantum protocols and developed techniques for their analysis.
+
+PhD thesis: [link](https://umontreal.scholaris.ca/items/848920f5-8256-4e46-b6ff-c74a67049734), [pdf](./docs/phd_thesis.pdf)
+
+Prior to this, I completed my master's at the Institute for Quantum Computing, University of Waterloo working with <a href="https://lutkenhausgroup.wordpress.com/" target="_blank">Norbert Lütkenhaus</a> and my bachelor's at the Indian Institute of Technology, Delhi.
 
 Master's thesis: [link](http://hdl.handle.net/10012/15087), [pdf](./docs/Master-thesis.pdf)
 
+## Recent
+
+1. <a href = "https://hackmd.io/@Ingonyama/fast-labrador-prover" target="_blank">Let's Labrador</a>: an Ingonyama blog post explaining the Labrador zkSNARK
+1. Preprint for "Security proof for parallel DIQKD" <a href = "https://arxiv.org/abs/2507.03991" target="_blank">arXiv:2507.03991 </a> released.
+
 ## Publications
 
+1. Ashutosh Marwah and Frédéric Dupuis. Security proof for parallel DIQKD (preprint). <a href = "https://arxiv.org/abs/2507.03991" target="_blank">arXiv:2507.03991 </a> (2025)
 1. Ashutosh Marwah and Frédéric Dupuis. Universal chain rules from entropic triangle inequalities (preprint). <a href = "https://arxiv.org/abs/2412.06723" target="_blank">arXiv:2412.06723 </a> (2024)
    - Presentation at BIID 2024: [pptx](./presentations/uni-ch-rules-BIID.pptx)
 1. Ashutosh Marwah and Frédéric Dupuis. Proving security of BB84 under source correlations (preprint). <a href = "https://arxiv.org/abs/2402.12346" target="_blank">arXiv:2402.12346 </a> (2024)
@@ -36,9 +42,10 @@ Master's thesis: [link](http://hdl.handle.net/10012/15087), [pdf](./docs/Master-
 
 ## Miscellaneous
 
+1. <a href = "https://hackmd.io/@Ingonyama/fast-labrador-prover" target="_blank">Let's Labrador</a>: an Ingonyama blog post explaining the Labrador zkSNARK
+1. Presentation on <a href = "https://eprint.iacr.org/2023/1799" target="_blank">BabySpartan</a> (work by Srinath Setty and Justin Thaler): [pptx](./presentations/Presn-babySpartan.pptx)
 1. Approximately equal measurements result in approximately equal statistics: [pdf](https://github.com/goforashutosh/Close-meas-imply-close-stats/blob/master/paper.pdf)
 1. Approximate equality of quantum states implies operator inequality in large subspace: [link](https://mathoverflow.net/questions/448774/does-approximate-equality-of-quantum-states-imply-operator-inequality-in-a-large)
-1. Presentation on [BabySpartan](https://eprint.iacr.org/2023/1799) (work by Srinath Setty and Justin Thaler): [pptx](./presentations/Presn-babySpartan.pptx)
 
 ---
 
