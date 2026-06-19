@@ -2,7 +2,11 @@
 layout: default
 ---
 
-Hi, I am a cryptography researcher at <a href="https://www.ingonyama.com/" target="_blank">Ingonyama</a>. My work looks into the efficient implementation of cryptography, especially zero-knowledge protocols.
+Hi, I am Ashutosh. I am many things but on the work side: I spent the last year working as cryptography researcher at <a href="https://www.ingonyama.com/" target="_blank">Ingonyama</a> and then as an AI researcher as the company transitioned to <a href="https://www.moonmath.ai/" target="_blank">Moonmath.ai</a>.
+
+I am presently looking for opportunities in applied cryptography, particularly to build applications which enhance privacy and security of everyday users.
+
+This webpage is a bit outdated and I will fix that soon.
 
 ## Education
 
@@ -16,6 +20,7 @@ Master's thesis: <a href = "http://hdl.handle.net/10012/15087" target="_blank">l
 
 ## Recent
 
+1. Toronto Jazz Fest 2026 <a href = "/apps/torontojazz2026">schedule </a>
 1. <a href = "https://hackmd.io/@Ingonyama/fast-labrador-prover" target="_blank">Let's Labrador</a>: an Ingonyama blog post explaining the Labrador zkSNARK.
 1. Preprint for "Security proof for parallel DIQKD" <a href = "https://arxiv.org/abs/2507.03991" target="_blank">arXiv:2507.03991 </a> released.
 

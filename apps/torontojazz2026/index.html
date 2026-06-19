@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toronto Jazz Festival 2026 — Schedule, Bios & Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{--bg:#0f1320;--panel:#171c2e;--panel2:#1e2540;--ink:#eef1fb;--muted:#9aa3c4;--line:#2c3354;--gold:#e8b53a;--accent:#5b8def;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0c1020,#0f1320);color:var(--ink);}
+  header{padding:22px 20px 10px;text-align:center;border-bottom:1px solid var(--line);}
+  header h1{margin:0;font-size:clamp(20px,4vw,30px);letter-spacing:.5px}
+  header .sub{color:var(--gold);font-weight:600;margin-top:4px}
+  header .loc{color:var(--muted);font-size:13px;margin-top:2px}
+  .wrap{max-width:1280px;margin:0 auto;padding:16px}
+  .layout{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
+  .right{position:sticky;top:16px}
+  @media(max-width:860px){.layout{grid-template-columns:1fr}.right{position:static}}
+  @media(max-width:860px){#map{height:300px}.legend-hint{display:none}}
+  .days{display:flex;gap:8px;overflow-x:auto;padding:6px 4px 14px;scrollbar-width:thin}
+  .day{flex:0 0 auto;min-width:70px;text-align:center;padding:8px 12px;border-radius:14px;background:var(--panel);border:1px solid var(--line);cursor:pointer;transition:.15s}
+  .day:hover{border-color:var(--accent)}
+  .day .dow{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+  .day .num{font-size:20px;font-weight:700;line-height:1.1}
+  .day.active{background:linear-gradient(180deg,#3a4cff33,#1c2340);border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+  .day.active .num{color:var(--gold)}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 4px 16px}
+  .toggle{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px}
+  .toggle button{background:none;border:0;color:var(--muted);padding:6px 12px;border-radius:9px;cursor:pointer;font-size:13px}
+  .toggle button.on{background:var(--accent);color:#fff}
+  .legend-hint{color:var(--muted);font-size:12px;margin-left:auto}
+  .timeline{position:relative;padding-left:100px}
+  .timeline:before{content:"";position:absolute;left:80px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .slot{position:relative;margin-bottom:18px}
+  .slot .t{position:absolute;left:-100px;top:0;width:68px;text-align:right;color:var(--gold);font-weight:700;font-size:13px}
+  .slot .dot{position:absolute;left:-26px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px #0f1320,0 0 0 5px var(--line)}
+  .cards{display:flex;flex-direction:column;gap:8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-left-width:5px;border-radius:12px;padding:10px 13px;transition:.12s;cursor:pointer}
+  .card:hover{background:var(--panel2);transform:translateX(2px)}
+  .card.sel{box-shadow:0 0 0 2px var(--gold) inset}
+  .card .name{font-weight:600;font-size:15px}
+  .card .chev{float:right;color:var(--muted);font-size:11px;transition:.15s}
+  .card.open .chev{transform:rotate(180deg)}
+  .card .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:5px;font-size:12.5px;color:var(--muted)}
+  .pin{display:inline-flex;align-items:center;gap:5px}
+  .pin .swatch{width:9px;height:9px;border-radius:50%}
+  .badge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+  .badge.free{background:#1c3b2e;color:#5fe0a0;border:1px solid #2c6b4f}
+  .badge.paid{background:#3a2c12;color:var(--gold);border:1px solid #6b521c}
+  .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+  .tag{font-size:9.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:#222a47;color:#aab4dd;border:1px solid #313a60}
+  .tag.jazz{background:#1b2f4a;color:#7fb3ff;border-color:#2c4a72}
+  .tag.rock{background:#3a1f2a;color:#ff9bb0;border-color:#5e3344}
+  .tag.funk,.tag.soul{background:#3a2c12;color:#ffcf6b;border-color:#6b521c}
+  .tag.world,.tag.latin{background:#143028;color:#6fe0b0;border-color:#235848}
+  .tag.pop,.tag.alt{background:#2c2150;color:#c4a6ff;border-color:#45356f}
+  .tag.blues{background:#152138;color:#8fa8d8;border-color:#27395e}
+  .tag.folk{background:#2a2616;color:#d8c98f;border-color:#4a4427}
+  .card .note{font-size:12px;color:var(--muted);margin-top:3px;font-style:italic}
+  .card .syn{font-size:12.7px;color:var(--ink);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);display:none}
+  .card.open .syn{display:block}
+  .card .syn.unverified{color:var(--muted);font-style:italic}
+  .card .syn .src{display:block;margin-top:6px}
+  .card .syn .src a{color:var(--accent);text-decoration:none;font-size:12px}
+  .card .syn .src a:hover{text-decoration:underline}
+  .tba{opacity:.55}
+  .section-title{display:flex;align-items:center;gap:10px;margin:0 4px 12px;font-size:18px}
+  #map{height:430px;border-radius:14px;border:1px solid var(--line);z-index:0}
+  .leaflet-popup-content{font-weight:600}
+  .dist-panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px}
+  .dist-panel h3{margin:0 0 4px;font-size:15px}
+  .dist-panel .hint{color:var(--muted);font-size:12px;margin-bottom:10px}
+  .distrow{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}
+  .distrow:last-child{border-bottom:0}
+  .distrow:hover{background:var(--panel2)}
+  .distrow .swatch{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+  .distrow .vn{flex:1}
+  .distrow .km{color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums}
+  .distrow .wk{color:var(--muted);font-size:11.5px;width:64px;text-align:right}
+  .footer{color:var(--muted);font-size:11.5px;text-align:center;margin:26px 0 10px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <h1>Toronto Jazz Festival 2026</h1>
+  <div class="sub">June 19 – 28, 2026</div>
+  <div class="loc">Bloor–Yorkville & venues across the city</div>
+</header>
+<div class="wrap">
+  <div class="layout">
+    <div class="left">
+      <div class="days" id="days"></div>
+      <div class="controls">
+        <div class="toggle" id="filter">
+          <button data-f="all" class="on">All events</button>
+          <button data-f="free">Free only</button>
+        </div>
+        <span class="legend-hint">Tap a card to map it & open its bio →</span>
+      </div>
+      <div id="schedule"></div>
+    </div>
+    <div class="right">
+      <div id="map"></div>
+      <div class="dist-panel">
+        <h3 id="distTitle">Distances from…</h3>
+        <div class="hint" id="distHint">Click a venue pin to measure distances & walking times.</div>
+        <div id="distList"></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    Interactive map: Leaflet + OpenStreetMap. Synopses verified via web search (artist sites, festival pages, press);
+    a few thin acts link out instead. Free/Paid inferred (OLG Village, Sidewalk Sessions, The Pilot jams & the
+    June 21 Big Band Slam are free). Distances are straight-line; walking ~5 km/h. "TBA" = confirmed slot, artist unlisted.<br><br>
+    <strong style="color:var(--ink)">AI-generated content — verify before you go.</strong>
+    This schedule, artist bios and venue details were compiled and written with AI assistance.
+    Lineups, times and admission may change. Always confirm with the
+    <a href="https://torontojazz.com" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">official festival website</a>
+    before attending. Use at your own discretion.
+  </div>
+</div>
+<script>
+const TJF="https://torontojazz.com";
+const V={
+  pilot:{name:"The Pilot",addr:"22 Cumberland St",lat:43.6709,lon:-79.3886,c:"#577590"},
+  olg:{name:"OLG Village Stage",addr:"115 Cumberland St",lat:43.6707,lon:-79.3899,c:"#e63946"},
+  sidewalk:{name:"Sidewalk Sessions",addr:"Bloor–Yorkville",lat:43.6701,lon:-79.3908,c:"#2a9d8f"},
+  koerner:{name:"Koerner Hall",addr:"273 Bloor St W",lat:43.6675,lon:-79.3961,c:"#9d6bd0"},
+  danforth:{name:"Danforth Music Hall",addr:"147 Danforth Ave",lat:43.6766,lon:-79.3577,c:"#f3722c"},
+  phoenix:{name:"The Phoenix",addr:"410 Sherbourne St",lat:43.6640,lon:-79.3744,c:"#f9844a"},
+  modclub:{name:"The Mod Club",addr:"722 College St",lat:43.6545,lon:-79.4193,c:"#4895ef"},
+  hughs:{name:"Hugh's Room Live",addr:"296 Broadview Ave",lat:43.6615,lon:-79.3505,c:"#43aa8b"},
+  bistro:{name:"Jazz Bistro",addr:"251 Victoria St",lat:43.6565,lon:-79.3806,c:"#f9c74f"},
+  rex:{name:"The Rex Hotel",addr:"194 Queen St W",lat:43.6504,lon:-79.3884,c:"#c77dba"},
+};
+const F=true;
+/* ---- INFO: u=artist-page path, t=tags, d=verified synopsis ---- */
+const INFO={
+ // Headliners / touring
+ "The Soul Rebels":{u:"/artists/the-soul-rebels/",t:["funk","soul","jazz"],d:"This eight-piece powerhouse from New Orleans has spent decades reinventing the city's brass-band tradition for the modern era. Their sets erupt with funk, hip-hop, soul and rock energy over thunderous sousaphone and drums. Equally at home backing rappers and jazz legends, they turn any room into a dance party."},
+ "Cassandra Wilson":{u:"/artists/cassandra-wilson/",t:["jazz"],d:"A Grammy-winning vocalist whose smoky, unhurried contralto reshaped what a jazz singer could be. She's famed for atmospheric, genre-blurring reinventions of standards, blues and pop, often draped over earthy, rootsy arrangements. This appearance marks the 30th anniversary of her landmark album 'New Moon Daughter'."},
+ "Hiromi's Sonicwonder":{u:"/artists/hiromi/",t:["jazz","alt"],d:"Japanese pianist Hiromi is a force of nature, fusing jazz, funk, prog-rock and classical into electrifying, technically dazzling performances. Sonicwonder is her high-voltage electric band, leaning into groove and spectacle. Expect breathtaking virtuosity paired with genuine joy and showmanship."},
+ "Ibrahim Maalouf":{u:"/artists/ibrahim-maalouf/",t:["jazz","world"],d:"The Lebanese-French trumpeter plays a custom quarter-tone trumpet that lets him bend Arabic maqam scales into Western jazz. His music spans intimate folk and stadium-sized pop grandeur, often with cinematic sweep. One of Europe's most celebrated and genre-defying instrumentalists."},
+ "DOMi & JD Beck":{u:"/artists/domi-jd-beck/",t:["jazz","alt"],d:"A jaw-dropping young keyboard-and-drums duo who play at impossible speed while sounding utterly playful. They fold jazz harmony, hip-hop, electronica and pure chaos into something entirely their own. Championed by Anderson .Paak and Thundercat, they're a generational talent."},
+ "Kokoroko":{u:"/artists/kokoroko/",t:["jazz","world","funk"],d:"This London eight-piece draws deeply on Afrobeat, highlife and West African jazz traditions. Warm horn lines, hypnotic grooves and a communal spirit define their sound. They've become one of the brightest lights of the UK's new jazz movement."},
+ "Witch Prophet":{u:"/artists/witch-prophet/",t:["soul","alt"],d:"Toronto's Witch Prophet weaves neo-soul, jazz and hip-hop into lush, layered songs. Her work explores her Ethiopian-Eritrean heritage, identity and lineage with intimacy and warmth. A distinctive voice in the city's alternative R&B scene."},
+ "Avishai Cohen Big Vicious":{u:"/artists/avishai-cohen-big-vicious/",t:["jazz","alt","rock"],d:"Israeli trumpeter Avishai Cohen leads this electric band into adventurous territory — jazz fused with trip-hop, ambient textures and rock-edged grooves. Brooding, cinematic and beat-driven, it's a world away from straight-ahead jazz. A bold, immersive listening experience."},
+ "Kassa Overall":{u:"/artists/kassa-overall/",t:["jazz","alt"],d:"A drummer, producer and rapper who collapses the wall between modern jazz and hip-hop. His restless, sample-laced music feels both improvised and meticulously produced. One of the most forward-thinking artists in jazz today."},
+ "Mei Semones":{u:"/artists/mei-semones/",t:["alt","jazz","pop"],d:"A Brooklyn-based guitarist and songwriter who threads intricate jazz harmony and Brazilian bossa nova through math-y indie pop. She sings in both English and Japanese, with delicate, surprising melodies. A fresh, genre-fluid voice winning growing acclaim."},
+ "Emilie-Claire Barlow":{u:"/artists/emilie-claire-barlow/",t:["jazz","pop"],d:"A celebrated Canadian jazz vocalist and arranger known for her bright tone and meticulous, swinging arrangements. She reinterprets standards and pop tunes bilingually in English and French. A multiple Juno winner with a warm, sophisticated stage presence."},
+ "Billy Newton-Davis":{u:"/artists/billy-newton-davis/",t:["soul","pop"],d:"A Juno-winning R&B and soul vocalist with a rich, gospel-rooted voice. Over a long career he's collaborated widely and become a fixture of Canadian music. Here he opens for Emilie-Claire Barlow at Koerner Hall."},
+ "Isaiah Collier \"Collier Plays Coltrane\"":{u:"/artists/isaiah-collier-coltrane/",t:["jazz"],d:"A rising Chicago saxophonist channeling the spiritual intensity and fire of John Coltrane. His 'Collier Plays Coltrane' project honours that legacy with searching, deeply emotional improvisation. One of the most talked-about young voices in spiritual jazz."},
+ "Sullivan Fortner Solo Piano":{u:"/artists/sullivan-fortner/",t:["jazz"],d:"A Grammy-winning pianist celebrated for his harmonic depth, wit and fearless spontaneity. In solo performance he reveals a restless imagination, reinventing melodies on the spot. A musician's musician at the peak of his powers."},
+ "The Dip":{u:"/artists/the-dip/",t:["soul","funk","pop"],d:"This Seattle seven-piece delivers throwback rhythm-and-blues and soul with punchy horns and heartfelt songwriting. Their sound is vintage and detail-rich but never a mere pastiche. Built for grooving, swaying and singing along."},
+ "Laila Biali Quartet":{u:"/artists/laila-biali-quartet/",t:["jazz","pop"],d:"A multi-award-winning Canadian pianist, vocalist and radio host with a sound that gracefully transcends genre. She blends jazz sophistication with pop-leaning songcraft and crystalline vocals. A consummate, charismatic performer."},
+ "Gentiane MG":{u:"/artists/gentiane-mg/",t:["jazz"],d:"A Montreal pianist and composer crafting lyrical, contemplative contemporary acoustic jazz. Her trio writing is patient, textural and quietly adventurous. A rising figure in Canada's creative jazz scene."},
+ "Atlantic Jazz Collective feat. Norma Winstone":{u:"/artists/atlantic-jazz-collective/",t:["jazz"],d:"An East-coast Canadian ensemble joined by the pioneering British vocalist Norma Winstone. Winstone is renowned for her wordless improvising and gift for lyric writing. Together they promise an elegant, exploratory set."},
+ "Stephane Wrembel":{u:"/artists/stephane-wrembel/",t:["jazz","world"],d:"A French guitarist and devoted disciple of Django Reinhardt, delivering virtuosic, romantic gypsy-jazz. His playing ranges from breakneck swing to brooding, global-tinged originals. Known to many for composing music in Woody Allen films."},
+ "Ostara Project":{u:"/artists/the-ostara-project/",t:["jazz"],d:"An award-winning Canadian collective of leading women instrumentalists playing original contemporary jazz. The group spotlights both individual virtuosity and collective chemistry. A celebrated, forward-looking ensemble."},
+ "Amanda Rheaume":{u:"/artists/amanda-rheaume/",t:["folk","pop","alt"],d:"A Two-Spirit, Citizen of the Métis Nation singer-songwriter blending roots, folk and rock. Her music carries Indigenous storytelling and a strong sense of place and identity. A Juno-nominated artist and community builder."},
+ "Quique Escamilla":{u:"/artists/quique-escamilla/",t:["world","latin","rock"],d:"A Mexican-Canadian multi-instrumentalist who fuses traditional Mexican folk with rock, reggae and Latin grooves. His bilingual songs are colourful, political and joyously danceable. A Juno-winning fixture of Toronto's world-music scene."},
+ "Tamar Ilana & Ventanas":{u:"/artists/tamar-ilana-ventanas/",t:["world","latin"],d:"Led by a powerhouse vocalist and flamenco dancer, this Toronto ensemble weaves flamenco, Balkan, Mediterranean and Middle Eastern traditions. The music is fiery, communal and rhythmically rich. A passionate, border-crossing live experience."},
+ "Maya Killtron":{u:"/artists/maya-killtron/",t:["pop","funk"],d:"A Toronto vocalist serving retro-modern electro-funk and disco-flavoured dance-pop. Glossy, groove-driven and built for the dancefloor. Here she opens for Ibrahim Maalouf."},
+ "Jean-Michel Pilc Trio":{u:"/artists/jean-michel-pilc-trio/",t:["jazz"],d:"A French pianist famed for fearless, in-the-moment reinvention. His trio playing is intense, interactive and unpredictable, often reshaping tunes mid-performance. A thrilling display of risk-taking improvisation."},
+ "Roshane Wright and the Rosh Riddims Band":{u:"/artists/roshane-wright/",t:["jazz","world"],d:"Drummer-led group bridging jazz with Caribbean and reggae rhythms."},
+ // OLG Village locals
+ "Trash Panda Brass":{u:"/artists/trash-panda-brass/",t:["funk","soul"],d:"Six queer University of Toronto graduates on a mission to diversify the brass scene. Their high-energy, welcoming sets pay homage to quintessential queer hits and icons. Rooted in busking, they bring infectious party energy wherever they play."},
+ "Gareth Burgess":{u:"/artists/gareth-burgess/",t:["world","jazz"],d:"A steel-pan virtuoso with over three decades on the instrument. He performs with Kalabash and the Caribbean Jazz Collective and teaches for the TDSB and York University. A warm ambassador for Caribbean music in Toronto."},
+ "Nancy Walker Quartet":{u:"/artists/nancy-walker-quartet/",t:["jazz"],d:"A Toronto pianist writing some of the most sophisticated contemporary jazz in the country. Her accolades include the Montréal Jazz Festival's Grand Prix de Jazz and Juno nominations. Expect elegant, intricate, deeply musical compositions."},
+ "Jonathan Nvita":{u:"/artists/jonathan-nvita/",t:["jazz","world"],d:"A Kinshasa-born, Toronto-based Afro-jazz vocalist and multi-instrumentalist. His music opens a dialogue between Congolese rhythmic traditions and contemporary jazz. His debut album 'Mosisa' ('the roots') honours culture and spirituality."},
+ "DJ Moussa":{u:"/artists/dj-moussa/",t:["pop","world"],d:"Born in Côte d'Ivoire, Moussa Kante became a well-known DJ at university and community events in Quebec. He's since continued his musical journey in Toronto. Expect a globally minded, danceable set."},
+ "Rhythm Section":{u:"/artists/rhythm-section/",t:["world","funk"],d:"For this band, Ghanaian highlife is heritage and legacy — a bridge between generations. They honour where the genre began while letting it grow and breathe. Warm, groove-rich and celebratory."},
+ "Isy Aboagye":{u:"/artists/isy-aboagye/",t:["blues","soul"],d:"A Kitchener-Waterloo singer who won the 2025 Toronto Blues Society Talent Search. She blends classic blues influences with modern soul and a powerful mezzo voice. A fast-rising young talent."},
+ "Neda Mohamadpour":{u:"/artists/neda-mohammadpour/",t:["world","jazz"],d:"A Tehran-born vocalist who treats Iranian folk and traditional music as living stories. She trained in Persian maqam and embraces improvisation and microtonal nuance. Her work reaches into jazz and psychedelic interpretations of Persian themes."},
+ "Just Prince and Friends":{u:"/artists/just-prince/",t:["world","folk","rock"],d:"A Toronto singer-songwriter offering a soulful South Asian alternative sound. He blends folk, rock, blues and Hindustani classical music, singing in multiple languages. The result is intimate, spiritual and quietly powerful."},
+ "Duck Society":{u:"/artists/duck-society/",t:["jazz","funk"],d:"A Toronto jazz-fusion band gathering prominent and up-and-coming players. Their all-original music features tight arrangements with plenty of room to experiment. Expect a genre-spanning blend of jazz, funk, folk and fusion."},
+ "MA:Q":{u:"/artists/maq/",t:["jazz","funk"],d:"Led by Canadian-Filipina keyboardist Mary Ancheta of Vancouver, this group plays groove-driven modern jazz-fusion. Influences range from Weather Report to Betty Davis to McCoy Tyner. Funk, hip-hop, Afrobeat and world textures all find their way in."},
+ "ADHD":{u:"/artists/adhd/",t:["jazz","rock","alt"],d:"An Icelandic quartet formed in 2007, crafting genre-dissolving instrumental music. Their sound is a hypnotic mix of melancholy, jazz-rock and ambient — spare and atmospheric. As elemental and quietly stirring as the Icelandic landscape itself."},
+ "Polky":{u:"/artists/polky/",t:["world","folk"],d:"A fiddle-driven feminist folk band bringing rural Polish and Central/Eastern European music to North America. Led by Canadian Folk Music Award winner Ewelina Ferenc, they draw on Carpathian, Jewish, Ukrainian and other traditions. Bold arrangements meet ancient melodies."},
+ "Selçuk Suna Quartet feat. Dia":{u:"/artists/selcuk-suna-quartet/",t:["jazz","world"],d:"Istanbul-born, Toronto-based clarinetist and saxophonist Selçuk Suna mixes traditional Turkish folk with jazz, hip-hop and funk. The quartet is fronted here by the powerhouse vocalist DIA. A vibrant cross-cultural collision of eras and styles."},
+ "Irene Torres":{u:"/artists/irene-torres/",t:["latin","world","soul"],d:"A Peruvian-born Toronto singer whose solo work returns to her roots. She blends Afro-Peruvian rhythms — landó, festejo, marinera — with bolero and blues-soul. A versatile, expressive front-woman across several Toronto projects."},
+ "Beny Esguerra and New Tradition Music":{u:"/artists/beny-esguerra/",t:["world","latin"],d:"A Juno-nominated percussionist and producer fusing ancestral Colombian traditions with urban culture. His ensemble pairs the Indigenous gaita flute and Afro-Colombian drums with hip-hop, spoken word and turntablism. Rooted yet thoroughly contemporary."},
+ "Orbital Ensemble":{u:"/artists/orbital-ensemble/",t:["jazz","world"],d:"A multicultural Toronto band fusing vintage Brazilian tones with modern psychedelic and jazz influences. Led by Brazilian composer-guitarist Felipe Sena, they explore bold new sonic territory. Warm, adventurous and richly textured."},
+ "Curtis Nowosad's Noisy World":{u:"/artists/curtis-nowosad-noisy-world/",t:["jazz","alt"],d:"A Juno-nominated, NYC-based drummer and composer leading a blues- and jazz-driven project featuring vocalist Joanna Majoko. His music carries a powerful social-justice undercurrent. Forceful, soulful and purposeful."},
+ "The Jazz Musician Intensive Ensemble":{u:"/artists/jmi-ensemble-2026/",t:["jazz"],d:"An all-star sextet of students from York, U of T and Humber jazz programs. This year they're led by Juno-nominated saxophonist Allison Au. A showcase of Toronto's next generation of jazz talent."},
+ "Charley Rose Trio":{u:"/artists/charley-rose-trio/",t:["jazz","alt","rock"],d:"A Parisian modern-jazz trio blending avant-garde jazz with a Stravinskian sense of form and raw rock energy. They shift from deep grooves to pure abstraction, with Dadaist humour and rhythmic precision. Daring, cerebral and surprisingly visceral."},
+ "Agneya":{u:"/artists/agneya/",t:["world","jazz"],d:"An Indo-Canadian percussionist and composer exploring rhythm as a meeting place between cultures. He blends South Asian rhythmic cycles, West African grooves and jazz improvisation. Raised in India and based in Toronto, he bridges worlds through rhythm."},
+ "Toronto Blues Society Talent Search Finals":{u:"/artists/tbs-talent-search/",t:["blues"],d:"The culminating showcase of the Toronto Blues Society's annual talent search. It spotlights the city's next breakout blues artists competing live. A great window into emerging local talent."},
+ "Breakthrough Jazz Artist Award Presentation":{u:"/artists/toronto-arts-foundation-breakthrough-jazz-artist-award/",t:["jazz"],d:"A short presentation from the Toronto Arts Foundation honouring a breakthrough jazz artist of the year. It celebrates a rising local musician's achievement. A brief but meaningful moment in the Village programming."},
+ // Sidewalk Sessions / The Rock
+ "El Ceibo":{u:"/artists/el-ceibo/",t:["latin","world"],d:"An Argentine-rooted group blending South American percussion and chamber-jazz traditions. The result is original, evocative and deeply atmospheric. A subtle, transporting Sidewalk set."},
+ "Tak Arikushi Trio":{u:"/artists/tak-arikushi/",t:["jazz"],d:"A Toronto guitarist specializing in virtuosic, Django-inspired gypsy-jazz. His recent work fuses Japanese melodies with hot swing, creating something both toe-tapping and introspective. Elegant, warm and quietly dazzling."},
+ "Swamperella":{u:"/artists/swamperella/",t:["world","folk"],d:"Toronto's beloved Louisiana-style Cajun and zydeco dance band, going strong since 1997. Driving accordion, gutsy fiddle and sultry vocals power their sound. Pure foot-stomping, dancefloor-filling joy."},
+ "Dieufaite Charles":{u:"/artists/dieufaite-charles/",t:["world","soul"],d:"A Canada-based recording artist blending African influences, soul and contemporary global sounds. His music is warm and expressive, rooted in storytelling. A heartfelt, border-crossing performer."},
+ "Hassan el Hadi":{u:"/artists/hassan-el-hadi/",t:["world"],d:"A Marrakesh-born oud and banjo player based in Quebec. He blends North African Berber and Andalusian traditions with jazz harmonies and Québécois foot-tapping rhythms. A gentle, cross-cultural fusion."},
+ "Nii Osabu":{u:"/artists/nii-osabu/",t:["world","soul"],d:"A Ghanaian highlife, Afrobeats and traditional musician based in Toronto. He's the founder and lead vocalist of the Afro Boys Band, with dozens of singles to his name. Groove-rich and rooted in Ghanaian tradition."},
+ "Mir Kashif Iqbal":{u:"/artists/mir-kashif-iqbal/",t:["rock","folk","world"],d:"A pioneering voice in Kashmiri and Urdu rock. He blends indie-folk, progressive and psychedelic rock with evocative poetry. His lyrics are rooted in Kashmiri and Urdu literary traditions."},
+ "Eunice Keitan":{u:"/artists/eunice-keitan/",t:["soul","world"],d:"A Malaysian-Canadian singer-songwriter merging neo-soul and world-folk. She draws on her Canadian, Malaysian and Colombian homes for a rich, soulful sound. Intimate and warmly expressive."},
+ "KOPI Trio":{u:"/artists/kopi-trio/",t:["jazz"],d:"A hip-hop/jazz trio convinced that the two traditions are forever intertwined. They play tunes by hip-hop greats alongside lesser-known jazz standards. Fresh, groove-savvy and genre-blending."},
+ "West End Riverboat Band":{u:"/artists/west-end-riverboat-band/",t:["jazz","rock"],d:"A musical paradox combining traditional New Orleans jazz with the raw energy of a rock band. Their 200-year repertoire spans choro to klezmer, country ballads to Chopin. It all becomes a stomping Mardi Gras dance soundtrack."},
+ "Trio da Rua":{u:"/artists/trio-da-rua/",t:["latin","world"],d:"A Toronto trio playing Brazilian street music — samba, choro and beyond. Lively, intimate and rhythmically infectious. A sunny Sidewalk Sessions highlight."},
+ "FreePlay":{u:"/artists/freeplay-duo/",t:["jazz","pop"],d:"A duo built on looping vocal artistry, layering live loops into rich soundscapes. Their improvised jazz-pop builds in real time before your ears. Inventive and immersive."},
+ "Rudy Ray":{u:"/artists/rudy-ray-kwaku/",t:["jazz","soul","funk"],d:"A collective led by Ghanaian-Canadian trumpeter Rudy Ray Kwaku. They serve an electrifying blend of African jazz, hip-hop, soul and experimental soundscapes. Forward-thinking and groove-driven."},
+ "Stuart Brignell Organ Trio":{u:"/artists/stuart-brignell-organ-trio/",t:["jazz","soul","funk"],d:"Led by an emerging Toronto soul/jazz saxophonist and Humber-trained bandleader. Their groovy organ-trio sets span jazz, soul, R&B, funk and Afrobeat. Music that stirs emotion while keeping the dancefloor moving."},
+ "Medusa Quartet":{u:"/artists/medusa-quartet/",t:["folk","world"],d:"A Canadian Folk Music Award-nominated chamber-folk string quartet. They cross-pollinate Middle Eastern, Scandinavian, Celtic, Appalachian and Eastern European music. Intricate, evocative and beautifully arranged."},
+ "Tangi Lion and Imi Oto":{u:"/artists/tangi-and-imi/",t:["world"],d:"A Toronto duo weaving global folk traditions into intimate, acoustic sets. Stripped-down and heartfelt. A quiet, contemplative Sidewalk pairing."},
+ "Ori Shalva":{u:"/artists/ori-shalva/",t:["world","folk"],d:"A Toronto-based Georgian family ensemble, regarded as Canada's foremost group of its kind. They perform UNESCO-recognized Georgian polyphony with visceral, ancient harmonies. A spine-tingling, millennia-old vocal tradition brought to life."},
+ "Gentle Weep":{u:"/artists/gentle-weep/",t:["world","jazz"],d:"A trio of Brazilian musicians in Toronto devoted to choro. This playful, longing 19th-century Rio genre's name means 'weep' in Portuguese. Virtuosic, nostalgic and endlessly charming."},
+ "Gaucho Jazz Project":{u:"/artists/gaucho-jazz-project/",t:["jazz","rock"],d:"A Toronto band recreating the jazz-rock of Steely Dan. Expect warm vocal harmonies and intricate, funky arrangements from a deep bench of local pros. A treat for fans of meticulous studio-pop made live."},
+ "Natasha Roldán":{u:"/artists/natasha-roldan/",t:["latin","folk","jazz"],d:"A Colombian-Canadian singer-songwriter traveling the landscapes of Latin folk and jazz with an alternative touch. Her music explores migration, revolution and love. A multiple Latin Awards Canada nominee."},
+ "JD Crosstown":{u:"/artists/jd-crosstown/",t:["folk","blues"],d:"A singer-songwriter and guitarist weaving the roots of folk, country and blues. Live performances are marked by emotional intimacy and technical skill. Honest, rootsy storytelling."},
+ "Lancelot Knight":{u:"/artists/lancelot-knight/",t:["folk","rock"],d:"A Plains Cree singer-songwriter with a powerful voice and masterful guitar work. His sets are an electrifying fusion of music and storytelling. A compelling Indigenous artist to watch."},
+ "Zamira Lacosta & Friends":{u:"/artists/zamira-lacosta/",t:["latin","pop","soul"],d:"A Cuban-born, Toronto-based singer and former opera vocalist. She blends Cuban rhythms, flamenco and pop-rock soul, backed by a dynamic band. Fiery, versatile and full of charisma."},
+ "Joseph Funk":{u:"/artists/joseph-funk/",t:["jazz"],d:"A University of Toronto trumpeter who leads his own jazz-based 10- and 7-piece orchestras. He also plays in several Toronto big bands. A dedicated young force in the city's large-ensemble scene."},
+ "Toronto Klezmer Society All-Stars":{u:"/artists/toronto-klezmer-society-all-stars/",t:["world","folk"],d:"Drawn from the Toronto Klezmer Society, founded in 2018 to grow the city's Jewish music scene. They play lively, danceable Eastern European Jewish folk. Tradition-honouring yet boundary-pushing."},
+ // Pilot late-night
+ "Amhed Mitchel":{u:"/artists/amhed-mitchel/",t:["jazz","latin"],d:"A Cuban-Canadian drummer in Toronto since 2006 and a sought-after session musician. He's collaborated widely across genres. Here he hosts the festival's opening-night late jam."},
+ "Lorie Wolf & Friends":{u:"/artists/lorie-wolf-friends/",t:["jazz"],d:"Award-winning drummer and bandleader Lorie Wolf (aka Queen Kong). She gathers creative, curious and slightly weird musicians for a freewheeling Pilot jam. Expect spontaneity and good humour."},
+ "Ernesto Cervini's \"The Next Set\"":{u:"/artists/ernesto-cervini-jam/",t:["jazz"],d:"Energetic, intricate small-group jazz led by one of Canada's top drummers. Cervini brings forward-looking compositions and tight ensemble chemistry. A late-night highlight for serious jazz fans."},
+ "Kae Murphy":{u:"/artists/kae-murphy/",t:["jazz","alt"],d:"A Grammy-winning trumpet player and multi-instrumentalist based in Toronto, known for touring with BADBADNOTGOOD. A 2023 TAF Emerging Jazz Artist. Modern, genre-aware and adventurous."},
+ "The Ale Nunez Quartet":{u:"/artists/ale-nunez/",t:["jazz","latin"],d:"A quartet led by guitarist Ale Nuñez, working across jazz and Latin idioms. Warm, melodic and groove-conscious. Hosting one of the festival's late jams."},
+ "The Ostara Project":{u:"/artists/the-ostara-project/",t:["jazz"],d:"An award-winning Canadian collective of leading women instrumentalists. They play original contemporary jazz with collective fire and individual brilliance. A standout late-night booking."},
+ "Virginia MacDonald Quartet":{u:"/artists/virginia-macdonald/",t:["jazz"],d:"Led by an acclaimed young Canadian clarinetist and composer. Her writing is modern, lyrical and rooted in post-bop tradition. A rising star of Canadian jazz."},
+ "Tyler Emond's Teenage Wasp":{u:"/artists/tyler-emond-teenage-wasp/",t:["jazz","soul"],d:"A group led by Toronto bassist, composer and producer Tyler Emond. Their music is a wild mix of Ellington-style jazz, modern classical and 1970s soul. Eclectic and exuberant."},
+ "Jen Lo Trio":{u:"/artists/jen-lo/",t:["jazz"],d:"A trio led by versatile Toronto pianist Jen Lo. A familiar and well-respected presence on the city's jazz scene. Hosting the festival's closing-night late jam."},
+ // Rex / Bistro house acts
+ "Gianluca Occhipinti Trio":{t:["jazz"],d:"A Toronto jazz trio led by guitarist Gianluca Occhipinti, part of The Rex's nightly programming. Melodic, swinging and intimate."},
+ "Swing Shift Big Band":{t:["jazz"],d:"A Toronto big band serving classic swing-era charts. Brassy, danceable and full of vintage energy. A crowd-pleasing afternoon set."},
+ "Neon Eagle":{t:["jazz","funk"],d:"A Toronto group bringing groove-leaning, contemporary jazz to The Rex. Tight and energetic. A reliable good time on the bandstand."},
+ "Jeremy Ledbetter Trio":{t:["jazz","latin","world"],d:"Pianist Jeremy Ledbetter's trio blends Latin, Caribbean and world rhythms with adventurous jazz harmony. Colourful and rhythmically rich. A well-travelled musical sensibility."},
+ "Paul Reddick":{t:["blues"],d:"A Juno-winning Canadian bluesman often called the 'poet of the blues.' He fuses harmonica-driven roots music with literary lyricism. A distinctive, soulful storyteller."},
+ "Mike Murley":{t:["jazz"],d:"A multi-Juno-winning Canadian saxophonist and mainstay of the national jazz scene. Known for warm, melodic post-bop playing. A consummate, deeply respected musician."},
+ "Peter Hum":{t:["jazz"],d:"An Ottawa pianist-composer and longtime jazz journalist. He leads a melodic, thoughtful post-bop set. Cerebral yet accessible."},
+ "Shalom Murray's Inner Femme":{t:["jazz","soul"],d:"A project led by Shalom Murray exploring jazz and soul through a personal, expressive lens. Intimate and emotionally direct."},
+ "Kyle Pogline":{t:["jazz"],d:"A Toronto guitarist leading a straight-ahead jazz set at The Rex. Tasteful and swinging. A solid evening of the tradition."},
+ "Mark Kelso's Jazz Exiles":{t:["jazz"],d:"Acclaimed Toronto drummer Mark Kelso leads his Jazz Exiles through energetic contemporary jazz and fusion. Dynamic and tightly played. A spirited bandstand showcase."},
+ "Alison Young":{t:["jazz"],d:"A Canadian saxophonist known for her swinging, soulful, straight-ahead playing. Warm-toned and assured. A welcome voice on the horn."},
+ "Mark McLean":{t:["jazz"],d:"A Toronto-rooted, internationally active drummer leading a groove-driven jazz set. Deep in the pocket and full of energy. A seasoned pro."},
+ "James Griffith":{t:["jazz"],d:"A Toronto saxophonist and bandleader presented at The Rex. Straight-ahead and dependable. A staple of the local scene."},
+ "Marc Decho's Quarteto Electrico":{t:["jazz","latin"],d:"Bassist Marc Decho's electric quartet blends jazz with Latin grooves. Plugged-in and rhythmically charged. A lively afternoon set."},
+ "Melat Mengesha":{t:["soul","jazz"],d:"A Toronto vocalist bringing soulful, jazz-tinged songcraft to The Rex. Warm and expressive. A rising local voice."},
+ "The Sicilian Jazz Project":{t:["jazz","world"],d:"A roots project reworking traditional Sicilian folk songs through a jazz and improv lens. Evocative and culturally rich. A unique reimagining of old-world material."},
+ "Canadian Jazz Collective":{t:["jazz"],d:"An all-star group showcasing Canadian players in a hard-bop and post-bop tradition. Polished and swinging. A celebration of national talent."},
+ "The Tania Gill/Chris Banks Trio":{t:["jazz"],d:"A Toronto trio co-led by pianist Tania Gill and bassist Chris Banks. They play inventive, exploratory contemporary jazz. Thoughtful and creative."},
+ "The Tim Hamel Quartet — All-Request Power Hour":{t:["jazz"],d:"Trumpeter Tim Hamel's quartet takes audience requests for a freewheeling 'power hour.' Spontaneous and interactive. A fun, unpredictable set."},
+ "The Patrick Smith Quintet":{t:["jazz"],d:"Saxophonist Patrick Smith's quintet performing modern, straight-ahead jazz. Robust and well-crafted. A satisfying evening of the music."},
+ "Jonathan Meyer Duo":{t:["jazz"],d:"An intimate jazz duo led by flutist Jonathan Meyer. Delicate and conversational. A gentle early-evening set."},
+ "Ben Dwyer Duo":{t:["jazz"],d:"Guitarist Ben Dwyer leads a relaxed jazz duo at Jazz Bistro. Mellow and melodic. Easy, refined listening."},
+ "The Joel Bracken Sextet":{t:["jazz"],d:"Joel Bracken's sextet performing full-bodied contemporary jazz. Rich ensemble textures and strong writing. A meaty, rewarding set."},
+ "The Big Band Slam feat. Christian Overton":{t:["jazz"],d:"A free, festival-presented big-band showcase led by trombonist Christian Overton. Bold, brassy and large-scale. A great free afternoon highlight."},
+ "JB Piano Bar: Peter Hill":{t:["jazz"],d:"Pianist Peter Hill plays the Jazz Bistro piano bar. Elegant and intimate. A classic cocktail-hour atmosphere."},
+};
+function getInfo(n){ if(INFO[n]) return INFO[n]; const b=n.replace(/\s*—.*$/,"").trim(); return INFO[b]||{t:["jazz"]}; }
+
+const E=[
+ {d:19,t:"5:00PM",n:"The Tania Gill/Chris Banks Trio",v:"bistro"},
+ {d:19,t:"5:00PM",n:"Gianluca Occhipinti Trio",v:"rex"},
+ {d:19,t:"5:45PM",n:"El Ceibo",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:19,t:"5:45PM",n:"Tak Arikushi Trio",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:19,t:"5:45PM",n:"Swamperella",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:19,t:"6:30PM",n:"Trash Panda Brass",v:"olg",free:F},
+ {d:19,t:"7:15PM",n:"Tak Arikushi Trio",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:19,t:"7:15PM",n:"Swamperella",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:19,t:"7:45PM",n:"El Ceibo",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:19,t:"8:00PM",n:"The Soul Rebels",v:"rex",note:"also 10:30PM · co-presented"},
+ {d:19,t:"8:00PM",n:"To Be Announced",v:"koerner",tba:true},
+ {d:19,t:"8:00PM",n:"To Be Announced",v:"danforth",tba:true},
+ {d:19,t:"8:00PM",n:"To Be Announced",v:"phoenix",tba:true},
+ {d:19,t:"8:00PM",n:"To Be Announced",v:"modclub",tba:true},
+ {d:19,t:"8:00PM",n:"To Be Announced",v:"hughs",tba:true},
+ {d:19,t:"8:30PM",n:"Gareth Burgess",v:"olg",free:F},
+ {d:19,t:"8:30PM",n:"Canadian Jazz Collective",v:"bistro"},
+ {d:19,t:"10:30PM",n:"Amhed Mitchel — Late Night Jam",v:"pilot",free:F},
+ {d:19,t:"11:30PM",n:"Late Night Jazz Jam (host: Dakota Dogood)",v:"bistro"},
+
+ {d:20,t:"2:00PM",n:"Swing Shift Big Band",v:"rex"},
+ {d:20,t:"4:30PM",n:"Nancy Walker Quartet",v:"olg",free:F},
+ {d:20,t:"5:00PM",n:"The Tim Hamel Quartet — All-Request Power Hour",v:"bistro"},
+ {d:20,t:"5:00PM",n:"Neon Eagle",v:"rex"},
+ {d:20,t:"5:00PM",n:"Dieufaite Charles",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:20,t:"5:00PM",n:"Hassan el Hadi",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:20,t:"5:45PM",n:"Nii Osabu",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:20,t:"6:30PM",n:"Jonathan Nvita",v:"olg",free:F},
+ {d:20,t:"6:30PM",n:"Dieufaite Charles",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:20,t:"6:30PM",n:"Hassan el Hadi",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:20,t:"7:30PM",n:"Nii Osabu",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:20,t:"8:00PM",n:"Jeremy Ledbetter Trio",v:"rex"},
+ {d:20,t:"8:00PM",n:"DJ Moussa",v:"olg",free:F},
+ {d:20,t:"8:00PM",n:"To Be Announced",v:"koerner",tba:true},
+ {d:20,t:"8:00PM",n:"To Be Announced",v:"danforth",tba:true},
+ {d:20,t:"8:00PM",n:"To Be Announced",v:"phoenix",tba:true},
+ {d:20,t:"8:00PM",n:"To Be Announced",v:"modclub",tba:true},
+ {d:20,t:"8:00PM",n:"To Be Announced",v:"hughs",tba:true},
+ {d:20,t:"8:30PM",n:"Canadian Jazz Collective",v:"bistro"},
+ {d:20,t:"8:45PM",n:"Rhythm Section",v:"olg",free:F},
+ {d:20,t:"10:30PM",n:"Late Night Hang",v:"rex"},
+ {d:20,t:"10:30PM",n:"Lorie Wolf & Friends — Late Night Jam",v:"pilot",free:F},
+
+ {d:21,t:"1:00PM",n:"The Big Band Slam feat. Christian Overton",v:"rex",free:F,note:"Free admission"},
+ {d:21,t:"4:30PM",n:"Isy Aboagye",v:"olg",free:F},
+ {d:21,t:"5:00PM",n:"Paul Reddick",v:"rex"},
+ {d:21,t:"5:00PM",n:"Mir Kashif Iqbal",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:21,t:"5:00PM",n:"Eunice Keitan",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:21,t:"5:45PM",n:"KOPI Trio",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:21,t:"6:30PM",n:"Neda Mohamadpour",v:"olg",free:F},
+ {d:21,t:"6:30PM",n:"Mir Kashif Iqbal",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:21,t:"6:30PM",n:"Eunice Keitan",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:21,t:"7:15PM",n:"KOPI Trio",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:21,t:"7:45PM",n:"Just Prince and Friends",v:"olg",free:F},
+ {d:21,t:"8:00PM",n:"Mike Murley",v:"rex"},
+ {d:21,t:"8:00PM",n:"To Be Announced",v:"koerner",tba:true},
+ {d:21,t:"8:00PM",n:"To Be Announced",v:"danforth",tba:true},
+ {d:21,t:"8:00PM",n:"To Be Announced",v:"phoenix",tba:true},
+ {d:21,t:"8:00PM",n:"To Be Announced",v:"modclub",tba:true},
+ {d:21,t:"8:00PM",n:"To Be Announced",v:"hughs",tba:true},
+ {d:21,t:"8:30PM",n:"KOPI Trio",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:21,t:"8:30PM",n:"Laila Biali Quartet",v:"bistro",note:"co-presented"},
+ {d:21,t:"9:00PM",n:"Duck Society",v:"olg",free:F},
+ {d:21,t:"10:30PM",n:"Ernesto Cervini's \"The Next Set\" — Late Night Jam",v:"pilot",free:F},
+
+ {d:22,t:"5:00PM",n:"Peter Hum",v:"rex"},
+ {d:22,t:"5:45PM",n:"West End Riverboat Band",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:22,t:"5:45PM",n:"Trio da Rua",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:22,t:"5:45PM",n:"FreePlay",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:22,t:"6:30PM",n:"Jean-Michel Pilc Trio",v:"olg",free:F},
+ {d:22,t:"7:00PM",n:"Isaiah Collier \"Collier Plays Coltrane\"",v:"hughs",note:"also 9:30PM"},
+ {d:22,t:"7:15PM",n:"West End Riverboat Band",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:22,t:"7:15PM",n:"Trio da Rua",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:22,t:"7:45PM",n:"FreePlay",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:22,t:"8:00PM",n:"Stephane Wrembel",v:"rex",note:"also 10:30PM · co-presented"},
+ {d:22,t:"8:00PM",n:"DOMi & JD Beck",v:"danforth"},
+ {d:22,t:"8:00PM",n:"To Be Announced",v:"koerner",tba:true},
+ {d:22,t:"8:00PM",n:"To Be Announced",v:"phoenix",tba:true},
+ {d:22,t:"8:00PM",n:"To Be Announced",v:"modclub",tba:true},
+ {d:22,t:"8:30PM",n:"MA:Q",v:"olg",free:F},
+ {d:22,t:"8:30PM",n:"Laila Biali Quartet",v:"bistro",note:"co-presented"},
+ {d:22,t:"10:30PM",n:"Kae Murphy — Late Night Jam",v:"pilot",free:F},
+
+ {d:23,t:"5:00PM",n:"JB Piano Bar: Peter Hill",v:"bistro"},
+ {d:23,t:"5:00PM",n:"Shalom Murray's Inner Femme",v:"rex"},
+ {d:23,t:"5:45PM",n:"Rudy Ray",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:23,t:"5:45PM",n:"Trio da Rua",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:23,t:"5:45PM",n:"Stuart Brignell Organ Trio",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:23,t:"6:15PM",n:"Breakthrough Jazz Artist Award Presentation",v:"olg",free:F},
+ {d:23,t:"6:30PM",n:"Roshane Wright and the Rosh Riddims Band",v:"olg",free:F},
+ {d:23,t:"7:15PM",n:"Trio da Rua",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:23,t:"7:15PM",n:"Stuart Brignell Organ Trio",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:23,t:"7:45PM",n:"Rudy Ray",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:23,t:"8:00PM",n:"Emilie-Claire Barlow",v:"koerner",note:"opening: Billy Newton-Davis"},
+ {d:23,t:"8:00PM",n:"Avishai Cohen Big Vicious",v:"rex",note:"also 10:30PM · co-presented"},
+ {d:23,t:"8:00PM",n:"To Be Announced",v:"danforth",tba:true},
+ {d:23,t:"8:00PM",n:"To Be Announced",v:"phoenix",tba:true},
+ {d:23,t:"8:00PM",n:"To Be Announced",v:"modclub",tba:true},
+ {d:23,t:"8:00PM",n:"To Be Announced",v:"hughs",tba:true},
+ {d:23,t:"8:30PM",n:"ADHD",v:"olg",free:F},
+ {d:23,t:"8:30PM",n:"The Patrick Smith Quintet",v:"bistro"},
+ {d:23,t:"10:30PM",n:"Roshane Wright and the Rosh Riddims Band — Late Night Jam",v:"pilot",free:F},
+
+ {d:24,t:"5:00PM",n:"Jonathan Meyer Duo",v:"bistro"},
+ {d:24,t:"5:00PM",n:"Kyle Pogline",v:"rex"},
+ {d:24,t:"5:45PM",n:"Medusa Quartet",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:24,t:"5:45PM",n:"Tangi Lion and Imi Oto",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:24,t:"6:30PM",n:"Polky",v:"olg",free:F},
+ {d:24,t:"7:15PM",n:"Medusa Quartet",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:24,t:"7:15PM",n:"Tangi Lion and Imi Oto",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:24,t:"7:15PM",n:"Ori Shalva",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:24,t:"7:45PM",n:"Selçuk Suna Quartet feat. Dia",v:"olg",free:F},
+ {d:24,t:"8:00PM",n:"Cassandra Wilson",v:"koerner"},
+ {d:24,t:"8:00PM",n:"The Dip",v:"danforth",note:"opening: Elysia Biro"},
+ {d:24,t:"8:00PM",n:"Mark Kelso's Jazz Exiles",v:"rex"},
+ {d:24,t:"8:00PM",n:"To Be Announced",v:"phoenix",tba:true},
+ {d:24,t:"8:00PM",n:"To Be Announced",v:"modclub",tba:true},
+ {d:24,t:"8:00PM",n:"To Be Announced",v:"hughs",tba:true},
+ {d:24,t:"8:30PM",n:"Ori Shalva",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:24,t:"8:30PM",n:"Gentiane MG",v:"bistro",note:"co-presented"},
+ {d:24,t:"9:00PM",n:"Tamar Ilana & Ventanas",v:"olg",free:F},
+ {d:24,t:"10:30PM",n:"The Ale Nunez Quartet — Late Night Jam",v:"pilot",free:F},
+
+ {d:25,t:"5:00PM",n:"Ben Dwyer Duo",v:"bistro"},
+ {d:25,t:"5:00PM",n:"Alison Young",v:"rex"},
+ {d:25,t:"5:45PM",n:"Gentle Weep",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:25,t:"5:45PM",n:"Gaucho Jazz Project",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:25,t:"6:00PM",n:"Natasha Roldán",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:25,t:"6:30PM",n:"Irene Torres",v:"olg",free:F},
+ {d:25,t:"7:15PM",n:"Natasha Roldán",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:25,t:"7:15PM",n:"Gentle Weep",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:25,t:"7:15PM",n:"Gaucho Jazz Project",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:25,t:"7:45PM",n:"Beny Esguerra and New Tradition Music",v:"olg",free:F},
+ {d:25,t:"8:00PM",n:"Kokoroko",v:"phoenix",note:"opening: Witch Prophet"},
+ {d:25,t:"8:00PM",n:"Mark McLean",v:"rex"},
+ {d:25,t:"8:00PM",n:"To Be Announced",v:"koerner",tba:true},
+ {d:25,t:"8:00PM",n:"To Be Announced",v:"danforth",tba:true},
+ {d:25,t:"8:00PM",n:"To Be Announced",v:"modclub",tba:true},
+ {d:25,t:"8:00PM",n:"To Be Announced",v:"hughs",tba:true},
+ {d:25,t:"8:30PM",n:"Natasha Roldán",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:25,t:"8:30PM",n:"The Joel Bracken Sextet",v:"bistro"},
+ {d:25,t:"9:00PM",n:"Orbital Ensemble",v:"olg",free:F},
+ {d:25,t:"10:30PM",n:"The Ostara Project — Late Night Jam",v:"pilot",free:F},
+
+ {d:26,t:"5:00PM",n:"The Tania Gill/Chris Banks Trio",v:"bistro"},
+ {d:26,t:"5:00PM",n:"James Griffith",v:"rex"},
+ {d:26,t:"5:45PM",n:"Stuart Brignell Organ Trio",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:26,t:"5:45PM",n:"Rudy Ray",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:26,t:"5:45PM",n:"West End Riverboat Band",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:26,t:"6:30PM",n:"Ostara Project",v:"olg",free:F},
+ {d:26,t:"7:15PM",n:"Rudy Ray",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:26,t:"7:15PM",n:"West End Riverboat Band",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:26,t:"7:45PM",n:"Stuart Brignell Organ Trio",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:26,t:"8:00PM",n:"Kassa Overall",v:"rex",note:"also 10:30PM · co-presented"},
+ {d:26,t:"8:00PM",n:"To Be Announced",v:"koerner",tba:true},
+ {d:26,t:"8:00PM",n:"To Be Announced",v:"danforth",tba:true},
+ {d:26,t:"8:00PM",n:"To Be Announced",v:"phoenix",tba:true},
+ {d:26,t:"8:00PM",n:"To Be Announced",v:"modclub",tba:true},
+ {d:26,t:"8:00PM",n:"To Be Announced",v:"hughs",tba:true},
+ {d:26,t:"8:30PM",n:"Curtis Nowosad's Noisy World",v:"olg",free:F,note:"feat. Joanna Majoko"},
+ {d:26,t:"8:30PM",n:"Atlantic Jazz Collective feat. Norma Winstone",v:"bistro",note:"co-presented"},
+ {d:26,t:"10:30PM",n:"Virginia MacDonald Quartet — Late Night Jam",v:"pilot",free:F},
+ {d:26,t:"11:30PM",n:"Late Night Jazz Jam (host: Duncan Wilson)",v:"bistro"},
+
+ {d:27,t:"2:00PM",n:"Marc Decho's Quarteto Electrico",v:"rex"},
+ {d:27,t:"4:30PM",n:"The Jazz Musician Intensive Ensemble",v:"olg",free:F,note:"with Allison Au"},
+ {d:27,t:"5:00PM",n:"The Tim Hamel Quartet — All-Request Power Hour",v:"bistro"},
+ {d:27,t:"5:00PM",n:"Neon Eagle",v:"rex"},
+ {d:27,t:"5:00PM",n:"JD Crosstown",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:27,t:"5:00PM",n:"Lancelot Knight",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:27,t:"5:45PM",n:"Zamira Lacosta & Friends",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:27,t:"6:30PM",n:"Amanda Rheaume",v:"olg",free:F},
+ {d:27,t:"6:30PM",n:"JD Crosstown",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:27,t:"6:30PM",n:"Lancelot Knight",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:27,t:"7:45PM",n:"Zamira Lacosta & Friends",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:27,t:"8:00PM",n:"Hiromi's Sonicwonder",v:"koerner"},
+ {d:27,t:"8:00PM",n:"Ibrahim Maalouf",v:"danforth",note:"opening: Maya Killtron"},
+ {d:27,t:"8:00PM",n:"Kassa Overall",v:"rex",note:"also 10:30PM · co-presented"},
+ {d:27,t:"8:00PM",n:"To Be Announced",v:"phoenix",tba:true},
+ {d:27,t:"8:00PM",n:"To Be Announced",v:"modclub",tba:true},
+ {d:27,t:"8:00PM",n:"To Be Announced",v:"hughs",tba:true},
+ {d:27,t:"8:30PM",n:"Quique Escamilla",v:"olg",free:F},
+ {d:27,t:"8:30PM",n:"Atlantic Jazz Collective feat. Norma Winstone",v:"bistro",note:"co-presented"},
+ {d:27,t:"10:30PM",n:"Tyler Emond's Teenage Wasp — Late Night Jam",v:"pilot",free:F},
+
+ {d:28,t:"2:00PM",n:"Melat Mengesha",v:"rex"},
+ {d:28,t:"2:45PM",n:"Toronto Blues Society Talent Search Finals",v:"olg",free:F},
+ {d:28,t:"5:00PM",n:"Paul Reddick",v:"rex"},
+ {d:28,t:"5:00PM",n:"Joseph Funk",v:"sidewalk",free:F,note:"157 Bloor St W"},
+ {d:28,t:"5:00PM",n:"Tak Arikushi Trio",v:"sidewalk",free:F,note:"55 Bloor St W"},
+ {d:28,t:"5:45PM",n:"Toronto Klezmer Society All-Stars",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:28,t:"6:30PM",n:"Charley Rose Trio",v:"olg",free:F},
+ {d:28,t:"6:30PM",n:"Joseph Funk",v:"sidewalk",free:F,note:"5 Hazelton Ave"},
+ {d:28,t:"6:30PM",n:"Tak Arikushi Trio",v:"sidewalk",free:F,note:"101 Yorkville Ave"},
+ {d:28,t:"7:30PM",n:"Sullivan Fortner Solo Piano",v:"bistro",note:"also 10:00PM · co-presented"},
+ {d:28,t:"7:45PM",n:"Toronto Klezmer Society All-Stars",v:"sidewalk",free:F,note:"The Rock, Yorkville Park"},
+ {d:28,t:"8:00PM",n:"The Sicilian Jazz Project",v:"rex"},
+ {d:28,t:"8:00PM",n:"Mei Semones",v:"modclub",note:"opening: Ale Nuñez"},
+ {d:28,t:"8:00PM",n:"To Be Announced",v:"koerner",tba:true},
+ {d:28,t:"8:00PM",n:"To Be Announced",v:"danforth",tba:true},
+ {d:28,t:"8:00PM",n:"To Be Announced",v:"phoenix",tba:true},
+ {d:28,t:"8:00PM",n:"To Be Announced",v:"hughs",tba:true},
+ {d:28,t:"8:30PM",n:"Agneya",v:"olg",free:F},
+ {d:28,t:"10:30PM",n:"Jen Lo Trio — Late Night Jam",v:"pilot",free:F},
+];
+
+function toMin(t){const m=t.match(/(\d+):(\d+)\s*(AM|PM)/i);let h=+m[1],mi=+m[2];const ap=m[3].toUpperCase();if(ap==="PM"&&h!==12)h+=12;if(ap==="AM"&&h===12)h=0;return h*60+mi;}
+const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function dow(day){return DOW[new Date(2026,5,day).getDay()];}
+function hav(a,b){const R=6371,r=Math.PI/180;const dLat=(b.lat-a.lat)*r,dLon=(b.lon-a.lon)*r;const x=Math.sin(dLat/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+let curDay=19,curFilter="all",curVenue=null;
+
+const daysEl=document.getElementById("days");
+for(let d=19;d<=28;d++){const el=document.createElement("div");el.className="day"+(d===19?" active":"");el.innerHTML=`<div class="dow">${dow(d)}</div><div class="num">${d}</div>`;el.onclick=()=>{curDay=d;[...daysEl.children].forEach(c=>c.classList.remove("active"));el.classList.add("active");render();};daysEl.appendChild(el);}
+document.getElementById("filter").addEventListener("click",e=>{if(e.target.dataset.f){curFilter=e.target.dataset.f;[...e.currentTarget.children].forEach(b=>b.classList.toggle("on",b===e.target));render();}});
+
+function render(){
+  const sch=document.getElementById("schedule");sch.innerHTML="";
+  let evs=E.filter(e=>e.d===curDay&&(curFilter==="all"||e.free));
+  evs.sort((a,b)=>toMin(a.t)-toMin(b.t)||V[a.v].name.localeCompare(V[b.v].name));
+  if(!evs.length){sch.innerHTML=`<p style="color:var(--muted);padding:10px">No matching events.</p>`;return;}
+  const tl=document.createElement("div");tl.className="timeline";let lastT=null,slot,cards;
+  evs.forEach(e=>{
+    if(e.t!==lastT){slot=document.createElement("div");slot.className="slot";slot.innerHTML=`<div class="t">${e.t.replace(/(AM|PM)/i,m=>" "+m.toLowerCase())}</div><div class="dot"></div>`;cards=document.createElement("div");cards.className="cards";slot.appendChild(cards);tl.appendChild(slot);lastT=e.t;}
+    const v=V[e.v];const info=e.tba?{t:[]}:getInfo(e.n);
+    const tags=(info.t||[]).map(t=>`<span class="tag ${t}">${t}</span>`).join("");
+    const link=info.u?`<span class="src"><a href="${TJF}${info.u}" target="_blank" rel="noopener">Artist page on torontojazz.com →</a></span>`:"";
+    const syn=e.tba?`<div class="syn unverified">Artist to be announced for this slot.</div>`
+      :info.d?`<div class="syn">${info.d}${link}</div>`
+      :`<div class="syn unverified">No verified description on file.${link}</div>`;
+    const c=document.createElement("div");c.className="card"+(e.tba?" tba":"");c.style.borderLeftColor=v.c;c.dataset.v=e.v;
+    c.innerHTML=`<div class="name">${e.n}<span class="chev">▼</span></div>
+      <div class="meta"><span class="pin"><span class="swatch" style="background:${v.c}"></span>${v.name}</span><span class="badge ${e.free?"free":"paid"}">${e.free?"Free":"Paid"}</span></div>
+      ${tags?`<div class="tags">${tags}</div>`:""}${e.note?`<div class="note">${e.note}</div>`:""}${syn}`;
+    // Single click on the card: highlight venue on map AND toggle synopsis
+    c.onclick=(ev)=>{
+      if(ev.target.closest('.src a')) return;
+      const isMobile=window.innerWidth<=860;
+      const wasOpen=c.classList.contains('open');
+      selectVenue(e.v,!isMobile);
+      document.querySelectorAll('.card.sel').forEach(x=>x.classList.remove('sel'));
+      document.querySelectorAll('.card.open').forEach(x=>x.classList.remove('open'));
+      c.classList.add('sel');
+      if(!wasOpen) c.classList.add('open');
+      if(isMobile&&!wasOpen) document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'});
+    };
+    cards.appendChild(c);
+  });
+  sch.appendChild(tl);
+}
+
+const map=L.map('map',{scrollWheelZoom:true});
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+const markers={},distLines=[];
+Object.keys(V).forEach(k=>{const v=V[k];const m=L.circleMarker([v.lat,v.lon],{radius:8,color:"#0c1020",weight:2,fillColor:v.c,fillOpacity:1}).addTo(map).bindPopup(`<b>${v.name}</b><br>${v.addr}`,{autoPan:false});m.on("click",()=>selectVenue(k,true));markers[k]=m;});
+map.fitBounds(L.latLngBounds(Object.values(V).map(v=>[v.lat,v.lon])).pad(0.15));
+
+function selectVenue(k,pan=true){
+  curVenue=k;
+  Object.keys(V).forEach(x=>markers[x].setStyle({radius:8,weight:2,color:"#0c1020"}));
+  markers[k].setStyle({radius:11,weight:3,color:"#ffffff"});
+  distLines.forEach(l=>map.removeLayer(l));distLines.length=0;
+  const v=V[k];
+  Object.keys(V).forEach(x=>{if(x===k)return;distLines.push(L.polyline([[v.lat,v.lon],[V[x].lat,V[x].lon]],{color:v.c,weight:1.5,dashArray:"5 4",opacity:.5}).addTo(map));});
+  if(pan){map.panTo([v.lat,v.lon]);markers[k].openPopup();}
+  document.getElementById("distTitle").textContent="Distances from "+v.name;
+  document.getElementById("distHint").textContent=v.addr+" — straight-line distance & walking time";
+  const others=Object.keys(V).filter(x=>x!==k).map(x=>({x,km:hav(v,V[x])})).sort((a,b)=>a.km-b.km);
+  document.getElementById("distList").innerHTML=others.map(o=>{const ov=V[o.x];const w=Math.round(o.km/5*60);return `<div class="distrow" onclick="selectVenue('${o.x}',true)"><span class="swatch" style="background:${ov.c}"></span><span class="vn">${ov.name}</span><span class="km">${o.km.toFixed(1)} km</span><span class="wk">~${w} min</span></div>`;}).join("");
+}
+render();
+selectVenue("olg",false);
+</script>
+</body>
+</html>
