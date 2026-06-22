@@ -18,7 +18,8 @@
   .layout{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
   .right{position:sticky;top:16px}
   @media(max-width:860px){.layout{grid-template-columns:1fr}.right{position:static}}
-  @media(max-width:860px){#map{height:300px}.legend-hint{display:none}}
+  @media(max-width:860px){#map{height:300px}.legend-hint{display:none}.left{min-width:0}.right{min-width:0}}
+  @media(max-width:480px){.day{min-width:58px;padding:6px 8px}.day .num{font-size:17px}}
   .days{display:flex;gap:8px;overflow-x:auto;padding:6px 4px 14px;scrollbar-width:thin}
   .day{flex:0 0 auto;min-width:70px;text-align:center;padding:8px 12px;border-radius:14px;background:var(--panel);border:1px solid var(--line);cursor:pointer;transition:.15s}
   .day:hover{border-color:var(--accent)}
@@ -499,7 +500,6 @@ function render(){
       document.querySelectorAll('.card.open').forEach(x=>x.classList.remove('open'));
       c.classList.add('sel');
       if(!wasOpen) c.classList.add('open');
-      if(isMobile&&!wasOpen) document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'});
     };
     cards.appendChild(c);
   });
