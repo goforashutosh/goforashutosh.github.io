@@ -4,7 +4,7 @@
 body {
   background-color: #fff;
   padding:50px;
-  font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 17.5px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color:#727272;
   font-weight:400;
 }
@@ -28,13 +28,20 @@ ul {
   margin-bottom: 0; /* Adjust as needed */
 }
 
+/* A list right after a paragraph belongs to it, like the bullets under each publication:
+   the -20px cancels the paragraph's 20px gap above the list, and the gap moves below the list. */
+p + ul {
+  margin-top: -20px;
+  margin-bottom: 20px;
+}
+
 
 h1, h2, h3 {
   line-height:1.1;
 }
 
 h1 {
-  font-size:28px;
+  font-size:35px;
 }
 
 // h2 {
